@@ -8,8 +8,12 @@ public:
     void parallelBFS(int startVertex); // заглушка, как в Java
     void bfs(int startVertex);         // обычный BFS
     int vertices() const;
+    bool checkDistances() const;
+    std::vector<int>& neighbours(int v);
 
 private:
     int V;
     std::vector<std::vector<int>> adjList;
+    std::vector<int> dists;
+    std::vector<int> pdists;
 };
