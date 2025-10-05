@@ -7,16 +7,16 @@
 #include "RandomGraphGenerator.h"
 
 static long long executeSerialBfsAndGetTime(Graph& g) {
-    auto start = std::chrono::steady_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     g.bfs(0);
-    auto end = std::chrono::steady_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }
 
 static long long executeParallelBfsAndGetTime(Graph& g) {
-    auto start = std::chrono::steady_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     g.parallelBFS(0); // заглушка
-    auto end = std::chrono::steady_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 }
 
@@ -29,12 +29,15 @@ int main() {
 
         std::filesystem::create_directories("tmp");
         std::ofstream fw("tmp/results.txt");
+        std::ofstream fcw("tmp/results.csv");
         if (!fw) {
             std::cerr << "Failed to open tmp/results.txt for writing\n";
             return 1;
         }
 
         RandomGraphGenerator gen;
+
+        fcw << "Count,Serial,Parallel\n";
 
         for (size_t i = 0; i < sizes.size(); ++i) {
             std::cout << "--------------------------\n";
@@ -43,6 +46,10 @@ int main() {
             std::cout << "Generation completed!\nStarting bfs\n";
             long long serialTime = executeSerialBfsAndGetTime(g);
             long long parallelTime = executeParallelBfsAndGetTime(g);
+
+            std::cout << (g.checkDistances() ? "Equal" : "Not equal") << "\n";
+            fcw << sizes[i] << "," << serialTime << "," << parallelTime << "\n";
+            fcw.flush();
 
             fw << "Times for " << sizes[i] << " vertices and " << connections[i] << " connections: ";
             fw << "\nSerial: " << serialTime;
